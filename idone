@@ -6,6 +6,9 @@ TEAM = ENV.fetch('IDONETHIS_TEAM')
 
 API_ROOT = 'https://idonethis.com/api/v0.1'
 
+OK = '✔︎'
+NOOK = '╳'
+
 if [USERNAME, TOKEN, TEAM].any?(&:empty?)
   help
   abort
@@ -53,32 +56,33 @@ end
 
 def show_list(response)
   response['results'].map do |res|
-    sigil = res['goal_completed'] ? '✔︎' : '╳'
-    puts "#{sigil}\t#{res['markedup_text']}"
+    sigil = res['goal_completed'] ? OK : NOOK
+    puts "#{sigil}\t#{res['owner']} - #{res['markedup_text']}"
   end
 end
 
 def show_create(response)
   if response['ok']
-    puts '✔︎ Ok'
+    puts "#{OK} Ok"
   else
-    puts 'Failed'
+    puts "#{NOOK} Failed"
     pp response
   end
 end
 
 done_text = ARGV[0]
 
-if ['-h', '-?', '--help'].include? done_text.strip.chomp
+if ['-h', '-?', '--help'].include? done_text.to_s.strip.chomp
   help
   exit 0
 end
 
 create_done(done_text) unless done_text.nil? || done_text.empty?
 
+# TODO: add swtich for showing only my dones
 puts '> Yesterday'
-show_list req params: { done_date: 'yesterday', owner: USERNAME }
+show_list req params: { done_date: 'yesterday' }
 puts
 
 puts '> Today'
-show_list req params: { done_date: 'today', owner: USERNAME }
+show_list req params: { done_date: 'today' }
