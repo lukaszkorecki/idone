@@ -39,6 +39,12 @@ Usage:
 ```
 
 
+# TODO
+
+- Rewrite from Ruby to Go for even less dependencies
+- Add sane command line switches
+- More emoji
+
 # License
 
 GPLv3
