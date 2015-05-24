@@ -18,6 +18,8 @@ require 'json'
 require 'net/http'
 require 'pp'
 
+require 'optparse'
+
 def help
   puts <<-EOF.gsub(/^.*#./, '')
      # Quick and dirty script for idonethis.com
@@ -58,9 +60,20 @@ end
 
 def show_list(response)
   response['results'].map do |res|
-    sigil = res['goal_completed'] ? OK : NOOK
-    puts "#{sigil}\t#{res['owner']} - #{res['markedup_text']}"
+    show_done(res)
   end
+end
+
+DONE_TEMPLATE = <<-EOF
+%{sigil} | %{id} | %{owner} | %{text}
+EOF
+
+def show_done(done)
+  sigil = done['goal_completed'] ? OK : NOOK
+  puts DONE_TEMPLATE % { id: done['id'],
+                         owner: done['owner'],
+                         sigil: sigil,
+                         text: done['markedup_text'] }
 end
 
 def show_create(response)
