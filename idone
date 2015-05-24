@@ -10,7 +10,7 @@ OK = '✔︎'
 NOOK = '╳'
 
 if [USERNAME, TOKEN, TEAM].any?(&:empty?)
-  help
+  puts help
   abort
 end
 
@@ -21,18 +21,20 @@ require 'pp'
 require 'optparse'
 
 def help
-  puts <<-EOF.gsub(/^.*#./, '')
+  <<-EOF.gsub(/^.*#(\s)?/, '')
      # Quick and dirty script for idonethis.com
      #
      # Requires follwing env variables:
      # - IDONETHIS_TEAM - team shortname (found in url)
      # - IDONETHIS_TOKEN - your idonethis api token
      # - IDONETHIS_USERNAME - your idonethis username
+     #
      # Usage:
-     #   idone "Finished idone script" - will create a new done
-     #   idone "[ ] I will get this done later" - to create a goal
-     #   idone - will list yesterday and today's dones
-
+     # idone --text="[ ] get this done!"
+     # idone --text="got it done" --id=2325
+     # idone -m
+     #
+     # Options:
 EOF
 end
 
@@ -53,9 +55,18 @@ def req(method: Net::HTTP::Get, path: '/dones/', params: {}, data: {})
   JSON.parse(resp.body)
 end
 
-def create_done(done_text, _is_goal = false)
+def create_done(done_text)
   res = req(method: Net::HTTP::Post, data: { raw_text: done_text, team: TEAM })
   show_create(res)
+end
+
+def update_done(id, done_text)
+  team_url = URI.parse(API_ROOT + '/teams/' + TEAM + '/').to_s
+  res = req(method: Net::HTTP::Put,
+            data: { raw_text: done_text, team: team_url },
+            path:  "/dones/#{id}/")
+
+  puts res
 end
 
 def show_list(response)
@@ -85,19 +96,41 @@ def show_create(response)
   end
 end
 
-done_text = ARGV[0]
+# ----------------------------------------------------
 
-if ['-h', '-?', '--help'].include? done_text.to_s.strip.chomp
-  help
-  exit 0
+options = { only_user: false }
+
+OptionParser.new do |opts|
+  opts.banner = help
+  opts.on('-tTEXT', '--text=TEXT', 'New to-be-done') do |text|
+    options[:text] = text
+  end
+
+  opts.on('-m', '--my', 'Show only my dones') do
+    options[:only_user] = true
+  end
+
+  opts.on('-uID', '--update=ID', 'Update existing done') do |id|
+    options[:id] = id
+  end
+end.parse!
+
+done_text = options[:text]
+if done_text.to_s.size > 0
+  id = options[:id]
+  if id
+    update_done(id, done_text)
+  else # created
+    create_done(done_text)
+  end
 end
 
-create_done(done_text) unless done_text.nil? || done_text.empty?
+list_opts = {}
+list_opts[:owner] = USERNAME if options[:only_user]
 
-# TODO: add swtich for showing only my dones
 puts '> Yesterday'
-show_list req params: { done_date: 'yesterday' }
+show_list req params: { done_date: 'yesterday' }.merge(list_opts)
 puts
 
 puts '> Today'
-show_list req params: { done_date: 'today' }
+show_list req params: { done_date: 'today' }.merge(list_opts)
