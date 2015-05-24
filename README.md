@@ -6,8 +6,9 @@ Tiny script to manage iDone this.
 # (Anti)features
 
 - 0 dependencies, just Ruby
-- Does only 2 things:
+- Does only 3 things:
   - allows creating dones
+  - allows updating dones
   - lists today's and yesterday's dones
 
 # Installation
