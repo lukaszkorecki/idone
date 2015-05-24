@@ -21,6 +21,9 @@ Tiny script to manage iDone this.
 
 # Usage:
 
+
+`idone -h`
+
 ---
 
 
@@ -42,11 +45,11 @@ Usage:
 
 ```
 
+---
 
 # TODO
 
 - Rewrite from Ruby to Go for even less dependencies
-- Add sane command line switches
 - More emoji
 
 # License
