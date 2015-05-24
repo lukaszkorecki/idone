@@ -1,11 +1,11 @@
 # iDoneThis
 
 
-Tiny script to manage iDone this.
+Tiny script to manage [iDoneThis](https://idonethis.com) items.
 
 # (Anti)features
 
-- 0 dependencies, just Ruby
+- 0 dependencies, just Ruby (2.0+)
 - Does only 3 things:
   - allows creating dones
   - allows updating dones
