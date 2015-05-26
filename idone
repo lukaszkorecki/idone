@@ -1,42 +1,46 @@
 #!/usr/bin/env ruby
 
-USERNAME = ENV.fetch('IDONETHIS_USERNAME')
-TOKEN = ENV.fetch('IDONETHIS_TOKEN')
-TEAM = ENV.fetch('IDONETHIS_TEAM')
-
-API_ROOT = 'https://idonethis.com/api/v0.1'
-
-OK = '✔︎'
-NOOK = '╳'
-
-if [USERNAME, TOKEN, TEAM].any?(&:empty?)
-  puts help
-  abort
-end
-
 require 'json'
 require 'net/http'
 require 'pp'
 
 require 'optparse'
 
-def help
-  <<-EOF.gsub(/^.*#(\s)?/, '')
-     # Quick and dirty script for idonethis.com
-     #
-     # Requires follwing env variables:
-     # - IDONETHIS_TEAM - team shortname (found in url)
-     # - IDONETHIS_TOKEN - your idonethis api token
-     # - IDONETHIS_USERNAME - your idonethis username
-     #
-     # Usage:
-     # idone --text="[ ] get this done!"
-     # idone --text="got it done" --id=2325
-     # idone -m
-     #
-     # Options:
+HELP = <<-EOF
+Quick and dirty script for idonethis.com
+
+Requires follwing env variables:
+   - IDONETHIS_TEAM - team shortname (found in url)
+   - IDONETHIS_TOKEN - your idonethis api token
+   - IDONETHIS_USERNAME - your idonethis username
+
+Usage:
+   idone --text="[ ] get this done!"
+   idone --text="got it done" --id=2325
+   idone -m
+
+Options:
 EOF
+
+USERNAME = ENV.fetch('IDONETHIS_USERNAME') do
+  puts HELP
+  abort 'IDONETHIS_USERNAME not set '
 end
+
+TOKEN = ENV.fetch('IDONETHIS_TOKEN') do
+  puts HELP
+  abort 'IDONETHIS_TOKEN not set'
+end
+
+TEAM = ENV.fetch('IDONETHIS_TEAM') do
+  puts HELP
+  abort 'IDONETHIS_TEAM not set'
+end
+
+API_ROOT = 'https://idonethis.com/api/v0.1'
+
+OK = '✅'
+NOOK = '❌'
 
 def req(method: Net::HTTP::Get, path: '/dones/', params: {}, data: {})
   param_str = ['?', URI.encode_www_form(params)].join ''
@@ -84,7 +88,7 @@ def show_done(done)
   puts DONE_TEMPLATE % { id: done['id'],
                          owner: done['owner'],
                          sigil: sigil,
-                         text: done['markedup_text'] }
+                         text: done['raw_text'] }
 end
 
 def show_create(response)
@@ -96,24 +100,30 @@ def show_create(response)
   end
 end
 
+def parse_options
+  options = { only_user: false }
+
+  OptionParser.new do |opts|
+    opts.banner = HELP
+    opts.on('-tTEXT', '--text=TEXT', 'New to-be-done') do |text|
+      options[:text] = text
+    end
+
+    opts.on('-m', '--my', 'Show only my dones') do
+      options[:only_user] = true
+    end
+
+    opts.on('-uID', '--update=ID', 'Update existing done') do |id|
+      options[:id] = id
+    end
+  end.parse!
+
+  options
+end
+
 # ----------------------------------------------------
 
-options = { only_user: false }
-
-OptionParser.new do |opts|
-  opts.banner = help
-  opts.on('-tTEXT', '--text=TEXT', 'New to-be-done') do |text|
-    options[:text] = text
-  end
-
-  opts.on('-m', '--my', 'Show only my dones') do
-    options[:only_user] = true
-  end
-
-  opts.on('-uID', '--update=ID', 'Update existing done') do |id|
-    options[:id] = id
-  end
-end.parse!
+options = parse_options
 
 done_text = options[:text]
 if done_text.to_s.size > 0
