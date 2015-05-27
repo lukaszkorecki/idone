@@ -39,8 +39,9 @@ end
 
 API_ROOT = 'https://idonethis.com/api/v0.1'
 
-OK = '✅'
-NOOK = '❌'
+OK = '✓'
+GOAL = '☐'
+NOOK = '✗'
 
 def req(method: Net::HTTP::Get, path: '/dones/', params: {}, data: {})
   param_str = ['?', URI.encode_www_form(params)].join ''
@@ -84,7 +85,7 @@ DONE_TEMPLATE = <<-EOF
 EOF
 
 def show_done(done)
-  sigil = done['goal_completed'] ? OK : NOOK
+  sigil = done['goal_completed'] ? OK : GOAL
   puts DONE_TEMPLATE % { id: done['id'],
                          owner: done['owner'],
                          sigil: sigil,
