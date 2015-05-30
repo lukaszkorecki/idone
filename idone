@@ -15,9 +15,11 @@ Requires follwing env variables:
    - IDONETHIS_USERNAME - your idonethis username
 
 Usage:
-   idone --text="[ ] get this done!"
-   idone --text="got it done" --id=2325
-   idone -m
+   idone --text="[ ] get this done!" - create a new goal
+   idone -t "got this done"
+   idone --text="got it done" --id=2325 - update a done
+   idone --all # show all dones from team
+   idone -c ID - complete a done
 
 Options:
 EOF
@@ -74,6 +76,15 @@ def update_done(id, done_text)
   puts res
 end
 
+def complete_done(id)
+  res = req(method: Net::HTTP::Get,
+            path: "/dones/#{id}/")
+
+  text = res['result']['raw_text']
+
+  update_done(id, text.sub(/\[.*\]/, ''))
+end
+
 def show_list(response)
   response['results'].map do |res|
     show_done(res)
@@ -102,7 +113,7 @@ def show_create(response)
 end
 
 def parse_options
-  options = { only_user: false }
+  options = { only_current_user: true }
 
   OptionParser.new do |opts|
     opts.banner = HELP
@@ -110,12 +121,18 @@ def parse_options
       options[:text] = text
     end
 
-    opts.on('-m', '--my', 'Show only my dones') do
-      options[:only_user] = true
+    opts.on('-a', '--all', 'Show dones from whole team') do
+      options[:only_current_user] = false
     end
 
     opts.on('-uID', '--update=ID', 'Update existing done') do |id|
       options[:id] = id
+    end
+
+    opts.on('-cID', '--complete=ID', 'Complete goal') do |id|
+      options[:text] = false
+      options[:id] = false
+      options[:complete_id] = id
     end
   end.parse!
 
@@ -126,18 +143,23 @@ end
 
 options = parse_options
 
-done_text = options[:text]
-if done_text.to_s.size > 0
-  id = options[:id]
-  if id
-    update_done(id, done_text)
-  else # created
-    create_done(done_text)
+if options[:complete_id]
+  complete_done(options[:complete_id])
+else
+
+  done_text = options[:text]
+  if done_text.to_s.size > 0
+    id = options[:id]
+    if id
+      update_done(id, done_text)
+    else # created
+      create_done(done_text)
+    end
   end
 end
 
 list_opts = {}
-list_opts[:owner] = USERNAME if options[:only_user]
+list_opts[:owner] = USERNAME if options[:only_current_user]
 
 puts '> Yesterday'
 show_list req params: { done_date: 'yesterday' }.merge(list_opts)
