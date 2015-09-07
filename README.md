@@ -42,6 +42,7 @@ Usage:
    idone --text="got it done" --id=2325 - update a done
    idone --all # show all dones from team
    idone -c ID - complete a done
+   idone -y - show yeseterday's dones
 
 Options:
     -t, --text=TEXT                  New to-be-done
