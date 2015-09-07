@@ -125,6 +125,10 @@ def parse_options
       options[:only_current_user] = false
     end
 
+    opts.on('-y', '--yesterday', 'Show yesterday\'s dones') do
+      options[:yesterday] = true
+    end
+
     opts.on('-uID', '--update=ID', 'Update existing done') do |id|
       options[:id] = id
     end
@@ -161,9 +165,11 @@ end
 list_opts = {}
 list_opts[:owner] = USERNAME if options[:only_current_user]
 
-puts '> Yesterday'
-show_list req params: { done_date: 'yesterday' }.merge(list_opts)
-puts
+if options[:yesterday]
+  puts '> Yesterday'
+  show_list req params: { done_date: 'yesterday' }.merge(list_opts)
+  puts
+end
 
 puts '> Today'
 show_list req params: { done_date: 'today' }.merge(list_opts)
