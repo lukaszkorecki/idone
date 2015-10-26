@@ -41,9 +41,6 @@ end
 
 API_ROOT = 'https://idonethis.com/api/v0.1'
 
-OK = '✓'
-GOAL = '☐'
-NOOK = '✗'
 
 def req(method: Net::HTTP::Get, path: '/dones/', params: {}, data: {})
   param_str = ['?', URI.encode_www_form(params)].join ''
@@ -133,6 +130,10 @@ def parse_options
       options[:id] = id
     end
 
+    opts.on('-b', '--boring', 'Disable colors') do
+      options[:boring] = true
+    end
+
     opts.on('-cID', '--complete=ID', 'Complete goal') do |id|
       options[:text] = false
       options[:id] = false
@@ -143,9 +144,21 @@ def parse_options
   options
 end
 
+
+
 # ----------------------------------------------------
 
 options = parse_options
+if options[:boring]
+  OK = '✓'
+  GOAL = '☐'
+  NOOK = '✗'
+else
+  reset = `tput sgr0`
+  OK = "#{`tput setaf 4`}✓#{reset}"
+  GOAL = "#{`tput setaf 6`}☐#{reset}"
+  NOOK = "#{`tput setaf 5`}✗#{reset}"
+end
 
 if options[:complete_id]
   complete_done(options[:complete_id])
