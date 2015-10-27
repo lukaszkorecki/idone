@@ -1,4 +1,4 @@
-# iDoneThis
+# idone
 
 
 Tiny [iDoneThis](https://idonethis.com) client.
@@ -15,9 +15,9 @@ Tiny [iDoneThis](https://idonethis.com) client.
 
 - Drop it somewhere in your $PATH
 - Set following enviornment variables:
-  - `IDONETHIS_TEAM` - team shortname (found in url)
-  - `IDONETHIS_TOKEN` - your idonethis api token
-  - `IDONETHIS_USERNAME` - your idonethis username
+  - `IDONETHIS_TEAM` - team shortname (found in URL, typically `https://idonethis.com/cal/<shortname>/`)
+  - `IDONETHIS_TOKEN` - your iDoneThis API token (see [here](https://idonethis.com/api/token/))
+  - `IDONETHIS_USERNAME` - your iDoneThis username (see [here](https://idonethis.com/accounts/settings/account/))
 
 
 # Usage:
