@@ -6,8 +6,10 @@ require 'pp'
 
 require 'optparse'
 
+VERSION = '1.0.0'
+
 HELP = <<-EOF
-Tiny client for idonethis.com
+Tiny client for idonethis.com, v#{VERSION}
 
 Requires follwing env variables:
   - IDONETHIS_TEAM - team shortname found in URL,

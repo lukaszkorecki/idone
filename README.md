@@ -2,6 +2,8 @@
 
 Tiny [iDoneThis](https://idonethis.com) client.
 
+![screenshot](https://www.evernote.com/shard/s537/sh/b564f045-cfee-4493-a506-b20449511c5f/1f9a935534e26002/res/779befa9-b839-45fe-b29e-a708a4fe4c93/skitch.png)
+
 # (Anti)features
 
 - 0 dependencies, just Ruby (2.0+), meaning it will work on Mac or farily recent
@@ -32,7 +34,7 @@ Tiny [iDoneThis](https://idonethis.com) client.
 ```
 
 
-Tiny client for idonethis.com
+Tiny client for idonethis.com, v1.0.0
 
 Requires follwing env variables:
   - IDONETHIS_TEAM - team shortname found in URL,
