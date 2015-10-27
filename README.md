@@ -21,6 +21,11 @@ Tiny [iDoneThis](https://idonethis.com) client.
   - `IDONETHIS_TEAM` - team shortname (found in URL, typically `https://idonethis.com/cal/<shortname>/`)
   - `IDONETHIS_TOKEN` - your iDoneThis API token (see [here](https://idonethis.com/api/token/))
   - `IDONETHIS_USERNAME` - your iDoneThis username (see [here](https://idonethis.com/accounts/settings/account/))
+- Done!
+
+To test run:
+
+`idone -y`
 
 
 # Usage:
