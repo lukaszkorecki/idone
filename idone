@@ -7,19 +7,27 @@ require 'pp'
 require 'optparse'
 
 HELP = <<-EOF
-Quick and dirty script for idonethis.com
+Tiny client for idonethis.com
 
 Requires follwing env variables:
-   - IDONETHIS_TEAM - team shortname (found in url)
-   - IDONETHIS_TOKEN - your idonethis api token
-   - IDONETHIS_USERNAME - your idonethis username
+  - IDONETHIS_TEAM - team shortname found in URL,
+                     typically https://idonethis.com/cal/<shortname>/
+  - IDONETHIS_TOKEN - your iDoneThis API token
+                      https://idonethis.com/api/token
+  - IDONETHIS_USERNAME - your iDoneThis username
+                      https://idonethis.com/accounts/settings/account/
 
 Usage:
    idone --text="[ ] get this done!" - create a new goal
-   idone -t "got this done"
+   idone -t "got this done" - log a done
    idone --text="got it done" --id=2325 - update a done
-   idone --all # show all dones from team
    idone -c ID - complete a done
+   idone --all - show all dones from team
+
+Example:
+  idone -t 'wrote idone client'
+  idone -t '[ ] write readme' # returns id 121324
+  idone -c 121324 # complete writing readme
 
 Options:
 EOF
@@ -40,7 +48,6 @@ TEAM = ENV.fetch('IDONETHIS_TEAM') do
 end
 
 API_ROOT = 'https://idonethis.com/api/v0.1'
-
 
 def req(method: Net::HTTP::Get, path: '/dones/', params: {}, data: {})
   param_str = ['?', URI.encode_www_form(params)].join ''
@@ -68,7 +75,7 @@ def update_done(id, done_text)
   team_url = URI.parse(API_ROOT + '/teams/' + TEAM + '/').to_s
   res = req(method: Net::HTTP::Put,
             data: { raw_text: done_text, team: team_url },
-            path:  "/dones/#{id}/")
+            path: "/dones/#{id}/")
 
   puts res
 end
@@ -143,8 +150,6 @@ def parse_options
 
   options
 end
-
-
 
 # ----------------------------------------------------
 
